@@ -1,5 +1,3 @@
-// src/pages/Landing.tsx
-import React from 'react';
 import Banner from '../components/Banner';
 import VideoBanner from '../components/VideoBanner';
 import NewArrivalsCarousel from '../components/NewArrivalsCarousel';

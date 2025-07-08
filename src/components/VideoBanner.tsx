@@ -1,6 +1,3 @@
-// src/components/VideoBanner.tsx
-import React from 'react'
-
 const VideoBanner: React.FC = () => {
   return (
     <div className="relative w-full h-[80vh] overflow-hidden">

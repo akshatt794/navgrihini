@@ -6,6 +6,19 @@ import {
   setTotalProducts,
 } from "../features/shop/shopSlice";
 
+// If not importing, define here:
+export type Product = {
+  _id?: string;
+  id?: string;
+  name: string;
+  title: string;
+  image: string;
+  price: number;
+  category: string;
+  popularity?: number;
+  stock?: number;
+};
+
 const ProductGridWrapper = ({
   searchQuery,
   sortCriteria,
@@ -35,9 +48,8 @@ const ProductGridWrapper = ({
       const response = await customFetch("/products");
       const allProducts = await response.data;
 
-      // Use "name" instead of "title"
       let searchedProducts = allProducts.filter((product: Product) =>
-        product.name && product.name.toLowerCase().includes(query.toLowerCase())
+        product.name.toLowerCase().includes(query.toLowerCase())
       );
 
       if (category) {
@@ -61,7 +73,7 @@ const ProductGridWrapper = ({
         );
       } else if (sort === "popularity" && allProducts[0]?.popularity) {
         searchedProducts = searchedProducts.sort(
-          (a: Product, b: Product) => b.popularity - a.popularity
+          (a: Product, b: Product) => (b.popularity ?? 0) - (a.popularity ?? 0)
         );
       }
 

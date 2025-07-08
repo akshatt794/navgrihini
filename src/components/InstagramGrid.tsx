@@ -1,5 +1,3 @@
-import React from 'react';
-
 const instagramImages = [
   "/images/insta1.jpg",
   "/images/insta2.jpg",

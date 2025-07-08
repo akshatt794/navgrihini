@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-interface Product {
-  _id: string;
+export interface Product {
+  _id?: string;       // Corrected: single underscore
+  id?: string;        // In case you map _id to id in backend/frontend
+  name: string;       // Make required if all products have name
   title: string;
   image: string;
   price: number;

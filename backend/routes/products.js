@@ -16,11 +16,15 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// GET all products
+// GET all products (with id mapped)
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find();
-    return res.json(products);
+    const productsWithId = products.map(product => ({
+      ...product._doc,
+      id: product._id.toString(),
+    }));
+    return res.json(productsWithId);
   } catch (err) {
     console.error("🔥 Error in GET /api/products:", err);
     return res
@@ -29,18 +33,33 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET single product (with id mapped)
+router.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
 
-// POST new product with image upload
+    // Map _id to id
+    const productWithId = {
+      ...product._doc,
+      id: product._id.toString(),
+    };
+    return res.json(productWithId);
+  } catch (err) {
+    console.error("🔥 Error in GET /api/products/:id:", err);
+    return res.status(500).json({ error: "Failed to fetch product" });
+  }
+});
+
+// POST new product with image upload (returning id)
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const { name, price, description, category } = req.body;
 
-    // Validate required fields
     if (!name || !price) {
       return res.status(400).json({ error: 'Name and price are required.' });
     }
 
-    // Build image path if file uploaded
     let image = '';
     if (req.file) {
       image = `/uploads/${req.file.filename}`;
@@ -55,7 +74,11 @@ router.post('/', upload.single('image'), async (req, res) => {
     });
 
     await product.save();
-    res.status(201).json(product);
+
+    const productObj = product.toObject();
+    productObj.id = productObj._id.toString();
+
+    res.status(201).json(productObj);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error saving product' });
@@ -73,7 +96,15 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     }
 
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
-    res.json(product);
+
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+
+    // Map _id to id
+    const productWithId = {
+      ...product._doc,
+      id: product._id.toString(),
+    };
+    res.json(productWithId);
   } catch (err) {
     res.status(500).json({ error: 'Error updating product' });
   }
