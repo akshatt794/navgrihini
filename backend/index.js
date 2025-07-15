@@ -9,6 +9,22 @@ require("dotenv").config();
 const app = express();
 const bannerRoutes = require('./routes/banners');
 app.use('/api/banners', bannerRoutes);
+const orderRoutes = require('./routes/orders');
+app.use('/api/orders', orderRoutes);
+const userRoutes = require('./routes/users');
+app.use('/api/users', userRoutes);
+
+// CORS + JSON body parsing
+const allowedOrigins = [
+  "https://navgrihini.netlify.app",
+  "http://localhost:5173", // for local dev
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true, // Only if you need cookies/auth (optional)
+}));
+app.use(express.json());
 
 
 // Ensure 'uploads' directory exists (prevents ENOENT errors on deployment)
