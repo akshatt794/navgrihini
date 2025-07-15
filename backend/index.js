@@ -22,6 +22,9 @@ app.use(cors({
   credentials: true,
 }));
 
+app.options("*", cors()); // <-- Add this line here
+
+
 // MIDDLEWARE
 app.use(express.json());
 app.use("/uploads", express.static(uploadsDir));
