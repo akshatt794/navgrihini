@@ -13,18 +13,25 @@ const orderRoutes = require('./routes/orders');
 app.use('/api/orders', orderRoutes);
 const userRoutes = require('./routes/users');
 app.use('/api/users', userRoutes);
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
-// CORS + JSON body parsing
-const allowedOrigins = [
-  "https://navgrihini.netlify.app",
-  "http://localhost:5173", // for local dev
-];
+// Require at the top
+const cors = require("cors");
 
+// Place BEFORE any routes
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true, // Only if you need cookies/auth (optional)
+  origin: [
+    "https://navgrihini.netlify.app",         // Your Netlify frontend
+    "http://localhost:5173",                  // For local dev
+    "https://navgrihini.onrender.com",        // (optional, for testing)
+  ],
+  credentials: true,
 }));
-app.use(express.json());
+
 
 
 // Ensure 'uploads' directory exists (prevents ENOENT errors on deployment)
