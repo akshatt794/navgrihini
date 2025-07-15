@@ -1,12 +1,217 @@
-// ...imports and type definitions...
+import React, { useEffect, useState, useRef } from "react";
+import customFetch from "../axios/custom";
+import ProductForm from "../components/ProductForm";
+
+// --- Style constants ---
+const cardClass: React.CSSProperties = {
+  background: "#fff",
+  boxShadow: "0 2px 8px #0001",
+  borderRadius: "10px",
+  padding: "28px 32px",
+  marginBottom: "32px",
+};
+const buttonClass: React.CSSProperties = {
+  padding: "8px 22px",
+  border: "none",
+  borderRadius: "6px",
+  background: "#222",
+  color: "#fff",
+  cursor: "pointer",
+  fontWeight: 500,
+  marginRight: "8px",
+};
+
+// --- Type definitions ---
+type Product = {
+  _id: string;
+  name: string;
+  price: number;
+  image: string;
+  description: string;
+  category: string;
+};
+type Banner = {
+  _id: string;
+  image: string;
+  title?: string;
+  link?: string;
+};
+type Order = {
+  _id: string;
+  user: string;
+  products: { productId: string; name: string; price: number; quantity: number }[];
+  total: number;
+  paymentStatus: string;
+  createdAt: string;
+};
+type User = {
+  _id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+};
+
+const inputClass: React.CSSProperties = {
+  width: "100%",
+  marginBottom: "12px",
+  padding: "8px",
+  border: "1px solid #ccc",
+  borderRadius: "6px",
+  fontSize: "1rem",
+};
 
 const AdminPanel: React.FC = () => {
-  // ...all useStates, handlers, and effects (keep as is)...
+  // ---- PRODUCTS ----
+  const [products, setProducts] = useState<Product[]>([]);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [message, setMessage] = useState("");
+
+  const fetchProducts = async () => {
+    try {
+      const res = await customFetch.get("/products");
+      setProducts(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setMessage("Error loading products.");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleDeleteProduct = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+    try {
+      await customFetch.delete(`/products/${id}`);
+      setMessage("Product deleted!");
+      fetchProducts();
+    } catch {
+      setMessage("Error deleting product");
+    }
+  };
+
+  const onProductFormSuccess = () => {
+    setEditingProduct(null);
+    setMessage("");
+    fetchProducts();
+  };
+
+  // ---- BANNERS ----
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [bannerForm, setBannerForm] = useState({ title: "", link: "" });
+  const [bannerMsg, setBannerMsg] = useState("");
+  const bannerFileRef = useRef<HTMLInputElement>(null);
+
+  const fetchBanners = async () => {
+    try {
+      const res = await customFetch.get("/banners");
+      setBanners(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setBannerMsg("Error loading banners.");
+    }
+  };
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBannerForm({ ...bannerForm, [e.target.name]: e.target.value });
+  };
+
+  const handleBannerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBannerMsg("");
+    const formData = new FormData();
+    if (bannerFileRef.current?.files?.[0]) {
+      formData.append("image", bannerFileRef.current.files[0]);
+    } else {
+      setBannerMsg("Please select a banner image.");
+      return;
+    }
+    formData.append("title", bannerForm.title);
+    formData.append("link", bannerForm.link);
+
+    try {
+      await customFetch.post("/banners", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setBannerMsg("Banner added!");
+      setBannerForm({ title: "", link: "" });
+      if (bannerFileRef.current) bannerFileRef.current.value = "";
+      fetchBanners();
+    } catch {
+      setBannerMsg("Error adding banner");
+    }
+  };
+
+  const handleDeleteBanner = async (id: string) => {
+    if (!window.confirm("Delete this banner?")) return;
+    try {
+      await customFetch.delete(`/banners/${id}`);
+      setBannerMsg("Banner deleted!");
+      fetchBanners();
+    } catch {
+      setBannerMsg("Error deleting banner");
+    }
+  };
+
+  // ---- ORDERS ----
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [orderMsg, setOrderMsg] = useState("");
+
+  const fetchOrders = async () => {
+    try {
+      const res = await customFetch.get("/orders");
+      setOrders(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setOrderMsg("Error loading orders.");
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  // ---- USERS ----
+  const [users, setUsers] = useState<User[]>([]);
+  const [userMsg, setUserMsg] = useState("");
+
+  const fetchUsers = async () => {
+    try {
+      const res = await customFetch.get("/users");
+      setUsers(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setUserMsg("Error loading users.");
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div style={{ maxWidth: 1050, margin: "40px auto", padding: 24 }}>
       {/* PRODUCT CARD */}
-      {/* ...ProductForm code... */}
+      <div style={cardClass}>
+        <h2 style={{ marginBottom: 24 }}>
+          {editingProduct ? "Edit Product" : "Add Product"}
+        </h2>
+        <ProductForm
+          editingProduct={editingProduct ?? undefined}
+          onSuccess={onProductFormSuccess}
+        />
+        {message && (
+          <div
+            style={{
+              marginTop: 10,
+              color: message.includes("Error") ? "red" : "green",
+            }}
+          >
+            {message}
+          </div>
+        )}
+      </div>
 
       {/* PRODUCTS LIST */}
       <div style={cardClass}>
@@ -75,62 +280,119 @@ const AdminPanel: React.FC = () => {
       </div>
 
       {/* BANNERS CARD */}
-      {/* ...form and add banner code... */}
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Title</th>
-            <th>Link</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(banners) && banners.length ? (
-            banners.map((b) => (
-              <tr key={b._id} style={{ borderTop: "1px solid #eee" }}>
-                <td>
-                  <img
-                    src={`http://localhost:8000${b.image}`}
-                    alt={b.title}
-                    style={{
-                      width: 90,
-                      height: 36,
-                      objectFit: "cover",
-                      borderRadius: 4,
-                    }}
-                  />
-                </td>
-                <td>{b.title}</td>
-                <td>
-                  {b.link && (
-                    <a href={b.link} target="_blank" rel="noopener noreferrer">
-                      {b.link}
-                    </a>
-                  )}
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleDeleteBanner(b._id)}
-                    style={{ ...buttonClass, background: "#f44336" }}
-                  >
-                    Delete
-                  </button>
+      <div style={cardClass}>
+        <h2>Manage Banners / Posters</h2>
+        <form
+          onSubmit={handleBannerSubmit}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gap: 14,
+            marginBottom: 18,
+          }}
+        >
+          <div>
+            <label style={{ fontWeight: 500 }}>Banner Image</label>
+            <input
+              ref={bannerFileRef}
+              type="file"
+              accept="image/*"
+              name="image"
+              style={inputClass}
+              required
+            />
+          </div>
+          <div>
+            <label style={{ fontWeight: 500 }}>
+              Banner Title (optional)
+            </label>
+            <input
+              name="title"
+              placeholder="Banner Title (optional)"
+              value={bannerForm.title}
+              onChange={handleBannerChange}
+              style={inputClass}
+            />
+          </div>
+          <div>
+            <label style={{ fontWeight: 500 }}>Link (optional)</label>
+            <input
+              name="link"
+              placeholder="Link (optional)"
+              value={bannerForm.link}
+              onChange={handleBannerChange}
+              style={inputClass}
+            />
+          </div>
+          <button
+            type="submit"
+            style={{ ...buttonClass, gridColumn: "1 / 4" }}
+          >
+            Add Banner
+          </button>
+        </form>
+        {bannerMsg && (
+          <div style={{ margin: "8px 0", color: "#28a745" }}>
+            {bannerMsg}
+          </div>
+        )}
+        <h4>All Banners/Posters</h4>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Link</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(banners) && banners.length ? (
+              banners.map((b) => (
+                <tr key={b._id} style={{ borderTop: "1px solid #eee" }}>
+                  <td>
+                    <img
+                      src={`https://navgrihini.onrender.com${b.image}`}
+                      alt={b.title}
+                      style={{
+                        width: 90,
+                        height: 36,
+                        objectFit: "cover",
+                        borderRadius: 4,
+                      }}
+                    />
+                  </td>
+                  <td>{b.title}</td>
+                  <td>
+                    {b.link && (
+                      <a href={b.link} target="_blank" rel="noopener noreferrer">
+                        {b.link}
+                      </a>
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => handleDeleteBanner(b._id)}
+                      style={{ ...buttonClass, background: "#f44336" }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={4}
+                  style={{ textAlign: "center", color: "#888" }}
+                >
+                  No banners found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan={4}
-                style={{ textAlign: "center", color: "#888" }}
-              >
-                No banners found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* ORDER SECTION */}
       <div style={cardClass}>
@@ -153,11 +415,12 @@ const AdminPanel: React.FC = () => {
                   <tr key={o._id} style={{ borderTop: "1px solid #eee" }}>
                     <td>{o.user}</td>
                     <td>
-                      {o.products.map((p, idx) => (
-                        <div key={idx}>
-                          {p.name} (x{p.quantity})
-                        </div>
-                      ))}
+                      {Array.isArray(o.products) &&
+                        o.products.map((p, idx) => (
+                          <div key={idx}>
+                            {p.name} (x{p.quantity})
+                          </div>
+                        ))}
                     </td>
                     <td>₹{o.total}</td>
                     <td>{o.paymentStatus}</td>
