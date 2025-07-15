@@ -7,6 +7,9 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = express();
+const bannerRoutes = require('./routes/banners');
+app.use('/api/banners', bannerRoutes);
+
 
 // Ensure 'uploads' directory exists (prevents ENOENT errors on deployment)
 const uploadsDir = path.join(__dirname, "uploads");
