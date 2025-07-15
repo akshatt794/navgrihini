@@ -14,10 +14,6 @@ const menuItems = [
 const Header = () => {
   return (
     <>
-      {/* Top Bar */}
-      <div className="w-full bg-[#294145] text-white text-center text-base py-2 font-medium tracking-wide">
-        COD Available | Express Shipping (PAN INDIA)
-      </div>
       {/* Main Header */}
       <header className="w-full bg-white shadow-sm">
         <div className="max-w-screen-2xl mx-auto flex items-center justify-between px-5 py-4">
