@@ -10,39 +10,41 @@ const app = express();
 
 // Ensure 'uploads' directory exists (prevents ENOENT errors on deployment)
 const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-// Place CORS BEFORE any routes
-app.use(cors({
-  origin: [
-    "https://navgrihini.netlify.app",         // Your Netlify frontend
-    "http://localhost:5173",                  // For local dev
-    "https://navgrihini.onrender.com",        // (optional, for testing)
-  ],
-  credentials: true,
-}));
+// CORS configuration (before routes)
+app.use(
+  cors({
+    origin: [
+      "https://navgrihini.netlify.app",   // Frontend live
+      "http://localhost:5173",            // Local dev
+      "https://navgrihini.onrender.com",  // (optional, for testing)
+    ],
+    credentials: true,
+  })
+);
 
-app.options("*", cors()); // <-- Add this line here
-
-
-// MIDDLEWARE
+// Body parser middleware
 app.use(express.json());
+
+// Serve static files (for uploaded images)
 app.use("/uploads", express.static(uploadsDir));
 
-// MODULAR ROUTES
+// Modular routes
 app.use("/api/products", require("./routes/products"));
 app.use("/api/banners", require("./routes/banners"));
 app.use("/api/orders", require("./routes/orders"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/auth", require("./routes/auth"));
 
-// HEALTH CHECK
+// Health check route
 app.get("/", (req, res) => res.send("Backend API is running!"));
 
-// DATABASE CONNECTION AND SERVER START
+// Database connection and server start
 const PORT = process.env.PORT || 8000;
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB");
     app.listen(PORT, () => console.log(`🚀 Server listening on port ${PORT}`));

@@ -1,18 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../utils/cloudinary');
 const Product = require('../models/Product');
 
-// Multer storage setup
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Make sure this folder exists
+// Cloudinary storage setup
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'navgrihini-products',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
 });
 const upload = multer({ storage });
 
@@ -51,7 +50,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST new product with image upload (returning id)
+// POST new product with image upload (Cloudinary)
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const { name, price, description, category } = req.body;
@@ -61,8 +60,8 @@ router.post('/', upload.single('image'), async (req, res) => {
     }
 
     let image = '';
-    if (req.file) {
-      image = `/uploads/${req.file.filename}`;
+    if (req.file && req.file.path) {
+      image = req.file.path; // This is the Cloudinary URL
     }
 
     const product = new Product({
@@ -91,8 +90,8 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     const { name, price, description, category } = req.body;
     const updateData = { name, price, description, category };
 
-    if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+    if (req.file && req.file.path) {
+      updateData.image = req.file.path; // Cloudinary URL
     }
 
     const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
