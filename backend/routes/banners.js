@@ -1,17 +1,19 @@
 // backend/routes/banners.js
+
 const express = require('express');
 const router = express.Router();
-const Banner = require('../models/Banner');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
-const path = require('path');
+const cloudinary = require('../utils/cloudinary');
+const Banner = require('../models/Banner');
 
-// Multer setup for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  }
+// Cloudinary storage for banners
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'navgrihini-banners',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  },
 });
 const upload = multer({ storage });
 
@@ -25,11 +27,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST new banner
+// POST new banner (with image upload to Cloudinary)
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const { title, link } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : "";
+    const image = req.file ? req.file.path : "";
     const banner = new Banner({ title, link, image });
     await banner.save();
     res.json(banner);
