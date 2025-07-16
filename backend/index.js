@@ -13,16 +13,28 @@ const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 // CORS configuration (before routes)
+const allowedOrigins = [
+  "https://navgrihini.netlify.app",
+  "https://www.navgrihini.netlify.app",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: [
-      "https://navgrihini.netlify.app",   // Frontend live
-      "http://localhost:5173",            // Local dev
-      "https://navgrihini.onrender.com",  // (optional, for testing)
-    ],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
+
 
 // Body parser middleware
 app.use(express.json());
