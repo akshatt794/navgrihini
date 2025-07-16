@@ -12,28 +12,29 @@ const app = express();
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-// CORS configuration (before routes)
 const allowedOrigins = [
   "https://navgrihini.netlify.app",
   "https://www.navgrihini.netlify.app",
   "http://localhost:5173",
+  "https://navgrihini.netlify.app/",   // Also try with trailing slash
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
+app.use(cors({
+  origin: function (origin, callback) {
+    console.log("CORS origin check:", origin);
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      /^https:\/\/.*\.navgrihini\.netlify\.app$/.test(origin)
+    ) {
       return callback(null, true);
-    },
-    credentials: true,
-  })
-);
+    }
+    const msg = "CORS: This origin is not allowed: " + origin;
+    return callback(new Error(msg), false);
+  },
+  credentials: true,
+}));
+
 
 
 // Body parser middleware
