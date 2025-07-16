@@ -1,10 +1,10 @@
+// src/pages/Landing.tsx
 import Banner from '../components/Banner';
 import VideoBanner from '../components/VideoBanner';
-import NewArrivalsCarousel from '../components/NewArrivalsCarousel';
-import InstagramGrid from '../components/InstagramGrid';
 import CategoriesSection from '../components/CategoriesSection';
 import HomeCollectionSection from '../components/HomeCollectionSection';
 import FAQSection from '../components/FAQSection';
+import ExploreAndBuy from '../components/ExploreAndBuy'; // <- Add this
 
 export default function Landing() {
   return (
@@ -19,23 +19,16 @@ export default function Landing() {
         <VideoBanner />
       </section>
 
-      {/* NEW ARRIVALS */}
-      <section className="py-20 px-5 bg-gray-50">
-        <h2 className="text-4xl font-semibold text-center mb-12">New Arrivals</h2>
-        <NewArrivalsCarousel />
-      </section>
-
-      {/* INSTAGRAM FEED */}
-      <section className="py-20 px-5 bg-white">
-        <h2 className="text-4xl font-semibold text-center mb-12">Styled by You</h2>
-        <InstagramGrid />
-      </section>
-
-      {/* SHOP BY CATEGORIES */}
-      <section className="py-20 px-5">
-        <h2 className="text-4xl font-semibold text-center mb-12">Shop by Categories</h2>
+      {/* SHOP BY COLLECTION (your old CategoriesSection, now in New Arrivals place) */}
+      <section className="py-20 px-5 bg-[#fdf7f0]">
+        <h2 className="text-4xl font-semibold text-center mb-12 font-serif tracking-wide" style={{ letterSpacing: '0.04em' }}>
+          SHOP BY COLLECTION
+        </h2>
         <CategoriesSection />
       </section>
+
+      {/* EXPLORE & BUY */}
+      <ExploreAndBuy />
 
       {/* FEATURED COLLECTION */}
       <section className="py-20 bg-gray-50 px-5">
