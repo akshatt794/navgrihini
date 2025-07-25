@@ -1,65 +1,53 @@
-// src/components/ExploreAndBuy.tsx
-import { Link } from "react-router-dom";
+import React from "react";
+import { Eye } from "lucide-react";
+import { exploreAndBuyData } from "../data/exploreandbuy";
 
-const exploreItems = [
-  {
-    name: "Kurta Sets",
-    image: "/images/explore-kurta.jpg",
-    link: "/shop/Kurta Sets",
-  },
-  {
-    name: "Sarees",
-    image: "/images/explore-saree.jpg",
-    link: "/shop/Sarees",
-  },
-  {
-    name: "Tunic Tops",
-    image: "/images/explore-tunic.jpg",
-    link: "/shop/Tunic Tops",
-  },
-  {
-    name: "Co-Ord Sets",
-    image: "/images/explore-coord.jpg",
-    link: "/shop/Co-Ord Sets",
-  },
-  {
-    name: "Bestsellers",
-    image: "/images/explore-bestseller.jpg",
-    link: "/shop/Bestsellers",
-  },
-  {
-    name: "Luxe",
-    image: "/images/explore-luxe.jpg",
-    link: "/shop/Luxe",
-  },
-];
-
-export default function ExploreAndBuy() {
+const ExploreAndBuy: React.FC = () => {
   return (
-    <section className="py-20 bg-white px-5">
-      <h2 className="text-4xl font-semibold text-center mb-12 font-serif">
-        Explore &amp; Buy
+    <section className="bg-[#fbf5ee] py-10">
+      <h2 className="text-4xl text-center font-serif text-[#174e4f] font-bold mb-10">
+        Explore and Buy
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {exploreItems.map((item) => (
-          <div key={item.name} className="relative group overflow-hidden rounded-xl shadow-md">
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-full h-[270px] object-cover transition-transform duration-300 group-hover:scale-105"
+      <div className="flex flex-wrap gap-8 justify-center px-2">
+        {exploreAndBuyData.map((item) => (
+          <div
+            key={item.id}
+            className="relative bg-white shadow-xl rounded-2xl w-[290px] overflow-hidden transition-transform hover:scale-105"
+            style={{ minHeight: 400 }}
+          >
+            {/* Views Badge */}
+            <div className="absolute top-3 left-3 bg-black/70 text-white flex items-center gap-1 px-2 py-1 rounded-md text-sm z-10">
+              <Eye size={18} />
+              <span>{item.views}</span>
+            </div>
+
+            {/* Video */}
+            <video
+              src={item.video}
+              poster={item.poster}
+              className="w-full h-[350px] object-cover"
+              autoPlay={false}
+              loop
+              muted
+              controls
+              playsInline
+              style={{
+                borderTopLeftRadius: "1rem",
+                borderTopRightRadius: "1rem",
+              }}
             />
-            <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-300">
-              <span className="text-2xl font-semibold text-white mb-4 drop-shadow">{item.name}</span>
-              <Link
-                to={item.link}
-                className="bg-white text-black px-6 py-2 rounded-full font-medium shadow hover:bg-gray-200 transition"
-              >
-                Shop Now
-              </Link>
+
+            {/* Card Content */}
+            <div className="absolute left-0 bottom-0 w-full bg-gradient-to-t from-black/70 via-black/10 to-transparent px-5 py-4">
+              <h3 className="text-lg font-medium text-white drop-shadow">
+                {item.title}
+              </h3>
             </div>
           </div>
         ))}
       </div>
     </section>
   );
-}
+};
+
+export default ExploreAndBuy;

@@ -10,7 +10,7 @@ const VideoBanner: React.FC = () => {
       />
       <div className="relative z-10 flex items-center justify-center h-full">
         <h1 className="text-white text-5xl font-bold text-center drop-shadow-lg">
-          Discover the Best NAVGRIHINI Collection
+          Discover the Best EVA Collection
         </h1>
       </div>
     </div>

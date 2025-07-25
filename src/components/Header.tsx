@@ -17,9 +17,14 @@ const Header = () => {
       {/* Main Header */}
       <header className="w-full bg-white shadow-sm">
         <div className="max-w-screen-2xl mx-auto flex items-center justify-between px-5 py-4">
-          {/* Logo */}
-          <Link to="/" className="text-3xl font-serif font-bold tracking-wide text-[#294145] whitespace-nowrap">
-            NAVGRIHINI
+          {/* Logo (replaces NAVGRIHINI text) */}
+          <Link to="/" className="flex items-center">
+            <img
+              src="/navgrihini-logo.jpg"
+              alt="Navgrihini Logo"
+              className="h-14 w-auto object-contain"
+              style={{ maxWidth: 150 }}
+            />
           </Link>
           {/* Centered Menu */}
           <nav className="flex-1 flex justify-center">

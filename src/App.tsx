@@ -1,5 +1,7 @@
 // src/App.tsx
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Footer from './components/Footer';
+<Footer />
 import {
   Cart,
   Checkout,
